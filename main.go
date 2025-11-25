@@ -10,13 +10,18 @@ import (
 //go:embed banner.txt
 var banner embed.FS
 
+var (
+	Version = "v0.0.1"
+)
+
 func printBanner() {
-	banner, err := banner.ReadFile("banner.txt")
+	text, err := banner.ReadFile("banner.txt")
 	if err != nil {
 		fmt.Println("Error reading banner.txt", err)
 		return
 	}
-	fmt.Println(string(banner))
+	textStr := strings.ReplaceAll(string(text), "$version", Version)
+	fmt.Println(textStr)
 }
 
 func main() {
@@ -36,24 +41,24 @@ func main() {
 		return
 	}
 	gtype := os.Args[1]
-	lang := os.Args[2]
-	name := "main"
+	glang := os.Args[2]
+	gname := "main"
 	if len(os.Args) > 3 {
-		name = os.Args[3]
+		gname = os.Args[3]
 	}
-	templ, ok := template[gtype][lang]
+	templ, ok := template[gtype][glang]
 	if !ok {
-		fmt.Printf("Type %s and %s not found\n", gtype, lang)
+		fmt.Printf("Type %s and %s not found\n", gtype, glang)
 		return
 	}
 	switch gtype {
 	case "CMake":
 		gtype = "CMakeLists.txt"
 	}
-	templ = strings.ReplaceAll(templ, "$name", name)
+	templ = strings.ReplaceAll(templ, "$name", gname)
 	if err := os.WriteFile(gtype, []byte(templ), os.ModePerm); err != nil {
 		fmt.Println("Error creating file", err)
 		return
 	}
-	fmt.Printf("Created %s file for %s 🎉\n", gtype, lang)
+	fmt.Printf("Created %s file for %s 🎉\n", gtype, glang)
 }
