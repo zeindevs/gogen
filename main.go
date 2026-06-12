@@ -4,31 +4,29 @@ import (
 	"embed"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 )
 
 //go:embed banner.txt
 var banner embed.FS
 
-var (
-	Version = "v0.0.1"
-)
+var Version = "v0.0.1"
+
+func printUsage() {
+	fmt.Println("Usage: gogen <type> <lang> <name:default main>")
+}
 
 func printBanner() {
-	text, err := banner.ReadFile("banner.txt")
-	if err != nil {
-		fmt.Println("Error reading banner.txt", err)
-		return
-	}
-	textStr := strings.ReplaceAll(string(text), "$version", Version)
-	fmt.Println(textStr)
+	text, _ := banner.ReadFile("banner.txt")
+	fmt.Println(strings.ReplaceAll(string(text), "$version", Version))
 }
 
 func main() {
-	if len(os.Args) == 2 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
+	if slices.Contains(os.Args, "-h") {
 		printBanner()
-		fmt.Println("Usage: gogen <type> <lang> <name:default main>")
-		fmt.Print("\nList of types:\n\n")
+		printUsage()
+		fmt.Print("\nList of generators:\n\n")
 		for k := range template {
 			for kl := range template[k] {
 				fmt.Println("-", k, kl)
@@ -36,29 +34,35 @@ func main() {
 		}
 		return
 	}
+
 	if len(os.Args) < 3 {
-		fmt.Println("Usage: gogen <type> <lang> <name:default main>")
+		printUsage()
 		return
 	}
-	gtype := os.Args[1]
-	glang := os.Args[2]
-	gname := "main"
+
+	gen := os.Args[1]
+	lang := os.Args[2]
+	name := "main"
 	if len(os.Args) > 3 {
-		gname = os.Args[3]
+		name = os.Args[3]
 	}
-	templ, ok := template[gtype][glang]
+
+	templ, ok := template[gen][lang]
 	if !ok {
-		fmt.Printf("Type %s and %s not found\n", gtype, glang)
+		fmt.Printf("Type %s and %s not found\n", gen, lang)
 		return
 	}
-	switch gtype {
+
+	switch gen {
 	case "CMake":
-		gtype = "CMakeLists.txt"
+		gen = "CMakeLists.txt"
 	}
-	templ = strings.ReplaceAll(templ, "$name", gname)
-	if err := os.WriteFile(gtype, []byte(templ), os.ModePerm); err != nil {
+
+	templ = strings.ReplaceAll(templ, "$name", name)
+	if err := os.WriteFile(gen, []byte(templ), 0644); err != nil {
 		fmt.Println("Error creating file", err)
 		return
 	}
-	fmt.Printf("Created %s file for %s 🎉\n", gtype, glang)
+
+	fmt.Printf("Created %s file for %s 🎉\n", gen, lang)
 }
