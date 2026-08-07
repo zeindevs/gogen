@@ -4,7 +4,10 @@ build:
 	go build -o ./bin/gogen .
 
 install:
-	go install -ldflags="-s -w" .
+	CGO_ENABLED=0 go install -ldflags="-s -w" .
+
+test:
+	 go test -v ./ -count=1
 
 run:
 	./bin/gogen

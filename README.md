@@ -1,36 +1,43 @@
-# gogen
-
-gogen is a simple utility to generate starter template for any language and project type.
+# gogen - Build system generator
 
 ## Installation
 
 ```bash
 go install github.com/zeindevs/gogen@latest
-
-# OR
-git clone https://github.com/zeindevs/gogen.git
-cd gogen
-make install
 ```
+
+Download:
+
+- <https://github.com/zeindevs/gogen/releases>
 
 ## Usage
 
 ```bash
 gogen <type> <lang> <name:default main>
+```
 
-# ex:
+Example:
+
+```bash
 gogen Makefile go main
 gogen CMake cpp main
 ```
 
-List of types:
+List of generators:
 
-- Makefile go
-- Makefile cpp
-- Makefile c
-- CMake cpp
-- CMake c
+- c CMake
+- c Makefile
+- c clang-format
+- c clang-tidy
+- cpp CMake
+- cpp Makefile
+- cpp clang-format
+- cpp clang-tidy
+- go Makefile
+- qt clang-format
 
 ## License
 
-Copyright (c) 2025 zeindevs and Lisenced under MIT License
+Copyright 2025-2026 Husein Assidiq. All Rights Reserved.
+
+[Apache-2.0](./LICENSE)

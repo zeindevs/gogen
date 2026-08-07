@@ -1,0 +1,41 @@
+cmake_minimum_required(VERSION 3.28)
+
+project($name VERSION 0.1.0 LANGUAGES C)
+
+set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wpedantic")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -DDEBUG")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s -O3")
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# find_package(PkgConfig REQUIRED)
+# find_package(bazlib REQUIRED)
+
+# pkg_check_modules(gtk REQUIRED gtk+-3.0)
+
+add_executable($name src/main.c)
+
+# add_subdirectory(foolib)
+
+# add_library(barlib STATIC IMPORTED)
+
+# set_target_properties(barlib PROPERTIES
+#     IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/barlib/libbar.a"
+# )
+
+target_include_directories($name PRIVATE
+	  "${CMAKE_SOURCE_DIR}/include" # ${gtk_INCLUDE_DIRS}
+)
+
+# target_link_libraries($name PRIVATE
+# 	  bazlib foolib barlib ${gtk_LIBRARIES}
+# )
+
+include(GNUInstallDirs)
+install(TARGETS $name
+	  BUNDLE DESTINATION .
+	  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)

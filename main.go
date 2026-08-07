@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
 	"os"
@@ -11,7 +12,10 @@ import (
 //go:embed banner.txt
 var banner embed.FS
 
-var Version = "v0.0.1"
+//go:embed template/*
+var templateFS embed.FS
+
+var Version = "v0.1.0"
 
 func printUsage() {
 	fmt.Println("Usage: gogen <type> <lang> <name:default main>")
@@ -22,15 +26,35 @@ func printBanner() {
 	fmt.Println(strings.ReplaceAll(string(text), "$version", Version))
 }
 
+func readTemplate(lang, temp, name string) ([]byte, string, error) {
+	switch temp {
+	case "Make":
+		temp += "file"
+	case "CMake":
+		temp += "Lists.txt"
+	}
+	raw, err := templateFS.ReadFile(fmt.Sprintf("template/%s.%s", lang, temp))
+	if err != nil {
+		return nil, temp, err
+	}
+	if temp == "clang-format" || temp == "clang-tidy" {
+		temp = "." + temp
+	}
+	raw = bytes.ReplaceAll(raw, []byte("$name"), []byte(name))
+	return raw, temp, nil
+}
+
 func main() {
 	if slices.Contains(os.Args, "-h") {
 		printBanner()
 		printUsage()
 		fmt.Print("\nList of generators:\n\n")
-		for k := range template {
-			for kl := range template[k] {
-				fmt.Println("-", k, kl)
-			}
+		templ, _ := templateFS.ReadDir("template")
+		for _, tmp := range templ {
+			r := strings.NewReplacer("File", "", "Lists.txt", "")
+			tname := r.Replace(tmp.Name())
+			parts := strings.Split(tname, ".")
+			fmt.Println("-", parts[0], parts[1])
 		}
 		return
 	}
@@ -47,22 +71,35 @@ func main() {
 		name = os.Args[3]
 	}
 
-	templ, ok := template[gen][lang]
-	if !ok {
-		fmt.Printf("Type %s and %s not found\n", gen, lang)
+	templ, fname, err := readTemplate(lang, gen, name)
+	if err != nil {
+		fmt.Printf("Type %s and %s not found\n", fname, lang)
 		return
 	}
 
-	switch gen {
-	case "CMake":
-		gen = "CMakeLists.txt"
+	msg := "Created"
+	if _, err := os.ReadFile(fname); err == nil {
+		var y string
+		fmt.Print("File already exist, will be replaced? (y/n): ")
+		n, err := fmt.Scan(&y)
+		if err != nil {
+			fmt.Printf("Something went wrong: %s", err)
+			return
+		}
+		if n != 1 {
+			fmt.Printf("Please enter (y/n)")
+			return
+		}
+		if y == "n" {
+			return
+		}
+		msg = "Replaced"
 	}
 
-	templ = strings.ReplaceAll(templ, "$name", name)
-	if err := os.WriteFile(gen, []byte(templ), 0644); err != nil {
+	if err := os.WriteFile(fname, templ, 0644); err != nil {
 		fmt.Println("Error creating file", err)
 		return
 	}
 
-	fmt.Printf("Created %s file for %s 🎉\n", gen, lang)
+	fmt.Printf("%s %s for %s 🎉\n", msg, fname, lang)
 }
