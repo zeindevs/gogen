@@ -1,13 +1,13 @@
+VERSION = $(shell git describe --tags --abbrev=0)
+LDFALGS = -ldflags="-s -w -X main.version=$(VERSION)"
+
 all: build run
 
 build:
-	go build -o ./bin/gogen .
+	go build $(LDFALGS) -o ./bin/gogen .
 
 install:
-	CGO_ENABLED=0 go install -ldflags="-s -w" .
-
-test:
-	 go test -v ./ -count=1
+	CGO_ENABLED=0 go install $(LDFALGS) .
 
 run:
 	./bin/gogen

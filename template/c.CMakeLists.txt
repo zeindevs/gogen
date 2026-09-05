@@ -17,6 +17,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable($name src/main.c)
 
+# target_compile_options($name
+#     $<$<CONFIG:Debug>:-g -DDEBUG>
+#     $<$<CONFIG:Release>:-s -03>
+# )
+
 # add_subdirectory(foolib)
 
 # add_library(barlib STATIC IMPORTED)

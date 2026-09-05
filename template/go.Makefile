@@ -1,10 +1,12 @@
+LDFLAGS = -ldflags="-s -w"
+
 all: build run
 
 build:
-	go build -o ./bin/$name .
+	go build $(LDFLAGS) -o ./bin/$name .
 
 install:
-	go install -ldflags="-s -w" .
+	go install $(LDFLAGS) .
 
 run:
 	./bin/$name
