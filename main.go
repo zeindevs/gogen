@@ -9,21 +9,25 @@ import (
 	"strings"
 )
 
-//go:embed banner.txt
-var bannerFS embed.FS
+var version = "dev"
+
+var banner = `
+   ____ _____  ____ ____  ____
+  / __  / __ \/ __  / _ \/ __ \
+ / /_/ / /_/ / /_/ /  __/ / / /
+ \__, /\____/\__, /\___/_/ /_/
+/____/      /____/ %s
+`
 
 //go:embed template/*
 var templateFS embed.FS
 
-var version = "v0.1.0"
-
 func printBanner() {
-	text, _ := bannerFS.ReadFile("banner.txt")
-	fmt.Println(strings.ReplaceAll(string(text), "$version", version))
+	fmt.Println(fmt.Sprintf(banner, version))
 }
 
 func printUsage() {
-	fmt.Println("Usage: gogen <type> <lang> <name:default main>\n Help: -h")
+	fmt.Println("Usage: gogen <type> <lang> <name:default main>")
 }
 
 func readTemplate(lang, temp, name string) ([]byte, string, error) {
