@@ -20,6 +20,9 @@ Example:
 
 ```bash
 gogen Makefile go main
+```
+
+```bash
 gogen CMake cpp main
 ```
 
@@ -33,11 +36,11 @@ List of generators:
 - cpp Makefile
 - cpp clang-format
 - cpp clang-tidy
+- github gorelease
 - go Makefile
+- go goreleaser
 - qt clang-format
 
 ## License
 
-Copyright 2025-2026 Husein Assidiq. All Rights Reserved.
-
-[Apache-2.0](./LICENSE)
+Licensed under the Apache License, Version 2.0 (the "License"); See [LICENSE](LICENSE) for more details.
